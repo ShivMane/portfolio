@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useInView, useReducedMotion } from "framer-motion";
 import { systemLog } from "@/data/config";
 import { cn } from "@/lib/utils";
 
@@ -23,10 +23,10 @@ function Line({ line }: { line: LogLine }) {
       const ok = line.status < 400;
       return (
         <>
-          <span className="w-12 shrink-0 text-fg">{line.method}</span>
+          <span className="w-11 shrink-0 text-fg sm:w-12">{line.method}</span>
           <span className="flex-1 truncate text-muted">{line.path}</span>
           <span className={cn("shrink-0", ok ? "text-ok" : "text-accent")}>{line.status}</span>
-          <span className="w-12 shrink-0 text-right text-subtle">{line.ms}ms</span>
+          <span className="hidden w-12 shrink-0 text-right text-subtle sm:inline">{line.ms}ms</span>
         </>
       );
     }
@@ -58,13 +58,18 @@ function Line({ line }: { line: LogLine }) {
 /** Simulated request/cron log that hints at the systems I build. */
 export function SystemPanel() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
   const [seq, setSeq] = useState(VISIBLE);
 
+  // Only tick while the panel is on screen and the tab is visible
   useEffect(() => {
-    if (reduce) return;
-    const id = setInterval(() => setSeq((s) => s + 1), 1600);
+    if (reduce || !inView) return;
+    const id = setInterval(() => {
+      if (!document.hidden) setSeq((s) => s + 1);
+    }, 1800);
     return () => clearInterval(id);
-  }, [reduce]);
+  }, [reduce, inView]);
 
   const lines = Array.from({ length: VISIBLE }, (_, i) => {
     const n = seq - VISIBLE + i;
@@ -72,7 +77,7 @@ export function SystemPanel() {
   });
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border hairline bg-surface">
+    <div ref={ref} className="relative overflow-hidden rounded-2xl border hairline bg-surface">
       <div className="flex items-center justify-between border-b hairline px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -84,28 +89,31 @@ export function SystemPanel() {
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-subtle">simulated</span>
       </div>
 
-      <ol className="mask-fade-b px-4 py-3 font-mono text-[11.5px] leading-[2.1] sm:text-xs" aria-hidden="true">
-        <AnimatePresence initial={false}>
-          {lines.map(({ n, line }) => (
-            <motion.li
+      <div className="relative overflow-hidden px-4 py-3 font-mono text-[11.5px] leading-[2.1] sm:text-xs" aria-hidden="true">
+        {/* Like a real terminal: rows shift instantly, only the newest row fades in */}
+        <ol>
+          {lines.map(({ n, line }, i) => (
+            <li
               key={n}
-              layout={!reduce}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-3 whitespace-nowrap"
+              className={cn(
+                "flex items-center gap-2.5 whitespace-nowrap sm:gap-3",
+                i === VISIBLE - 1 && !reduce && "animate-fade-in"
+              )}
             >
               <span className="shrink-0 text-subtle tabular">{stamp(n)}</span>
               <Line line={line} />
-            </motion.li>
+            </li>
           ))}
-        </AnimatePresence>
-      </ol>
+        </ol>
+        {/* Static fade instead of a CSS mask, which would repaint every frame */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-surface" />
+      </div>
 
       <div className="flex items-center gap-2 border-t hairline px-4 py-2.5 font-mono text-[11px] text-subtle">
         <span className="text-accent">❯</span>
-        <span>p95 48ms · 0 failed settlements · 10 crons healthy</span>
+        <span className="truncate">
+          p95 48ms · 0 failed settlements<span className="hidden sm:inline"> · 10 crons healthy</span>
+        </span>
         <span className="ml-auto h-3.5 w-1.5 animate-blink bg-fg/60" />
       </div>
     </div>

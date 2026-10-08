@@ -47,11 +47,16 @@ const config: Config = {
         ping: {
           "75%, 100%": { transform: "scale(2.2)", opacity: "0" },
         },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         marquee: "marquee 38s linear infinite",
         blink: "blink 1.1s step-end infinite",
         ping: "ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "fade-in": "fade-in 0.5s ease-out",
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",

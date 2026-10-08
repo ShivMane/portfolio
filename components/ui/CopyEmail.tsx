@@ -23,7 +23,7 @@ export function CopyEmail({ email, className }: { email: string; className?: str
       type="button"
       onClick={copy}
       className={cn(
-        "inline-flex items-center gap-2 font-mono text-xs text-muted transition-colors hover:text-fg",
+        "-my-3 inline-flex items-center gap-2 py-3 font-mono text-xs text-muted transition-colors hover:text-fg",
         className
       )}
       aria-live="polite"

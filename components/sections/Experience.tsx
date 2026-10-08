@@ -12,7 +12,7 @@ export function Experience() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="experience" className="container-page py-20 md:py-28" aria-labelledby="experience-heading">
+    <section id="experience" className="container-page py-16 md:py-28" aria-labelledby="experience-heading">
       <SectionHeader
         index="03"
         label="Experience"

@@ -36,80 +36,85 @@ export function Navbar() {
   const openCommand = () => window.dispatchEvent(new Event(OPEN_COMMAND_MENU));
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] transition-[background-color,border-color] duration-300",
-        scrolled || menuOpen ? "border-b hairline bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
-      )}
-    >
-      <nav className="container-page flex h-full items-center justify-between gap-6" aria-label="Main">
-        <a href="#top" className="group flex items-center gap-3" aria-label={`${hero.name}, home`}>
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-fg font-mono text-[11px] font-medium text-bg transition-colors group-hover:bg-accent group-hover:text-accent-fg">
-            SM
-          </span>
-          <span className="hidden text-sm font-medium sm:block md:hidden lg:block">{hero.name}</span>
-        </a>
-
-        <ul className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => {
-            const isActive = active === link.href;
-            return (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={isActive ? "true" : undefined}
-                  className={cn(
-                    "relative rounded-full px-3.5 py-1.5 text-sm transition-colors",
-                    isActive ? "text-fg" : "text-muted hover:text-fg"
-                  )}
-                >
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-pill"
-                      className="absolute inset-0 -z-10 rounded-full bg-fg/[0.06]"
-                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                    />
-                  )}
-                  {link.label}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={openCommand}
-            className="hidden h-9 items-center gap-2 rounded-full border hairline pl-3 pr-1.5 text-xs text-muted transition-colors hover:text-fg sm:flex"
-            aria-label="Open command menu"
-          >
-            <Search size={13} />
-            <span>Search</span>
-            <kbd className="rounded-full bg-fg/[0.06] px-2 py-0.5 font-mono text-[10px]">⌘K</kbd>
-          </button>
-          <ThemeToggle />
-          <a href={`mailto:${contact.email}`} className="btn-primary hidden h-9 px-4 text-[13px] lg:inline-flex">
-            Let&apos;s talk
+    <>
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 h-[var(--nav-h)] transition-[background-color,border-color] duration-300",
+          scrolled || menuOpen ? "border-b hairline bg-bg/90 backdrop-blur-md" : "border-b border-transparent"
+        )}
+      >
+        <nav className="container-page flex h-full items-center justify-between gap-6" aria-label="Main">
+          <a href="#top" className="group flex items-center gap-3" aria-label={`${hero.name}, home`}>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-fg font-mono text-[11px] font-medium text-bg transition-colors group-hover:bg-accent group-hover:text-accent-fg">
+              SM
+            </span>
+            <span className="hidden text-sm font-medium sm:block md:hidden lg:block">{hero.name}</span>
           </a>
-          <button
-            type="button"
-            className="grid h-9 w-9 place-items-center rounded-full text-fg md:hidden"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-          >
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-      </nav>
 
+          <ul className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => {
+              const isActive = active === link.href;
+              return (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={isActive ? "true" : undefined}
+                    className={cn(
+                      "relative rounded-full px-3.5 py-1.5 text-sm transition-colors",
+                      isActive ? "text-fg" : "text-muted hover:text-fg"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-pill"
+                        className="absolute inset-0 -z-10 rounded-full bg-fg/[0.06]"
+                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      />
+                    )}
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={openCommand}
+              className="hidden h-9 items-center gap-2 rounded-full border hairline pl-3 pr-1.5 text-xs text-muted transition-colors hover:text-fg sm:flex"
+              aria-label="Open command menu"
+            >
+              <Search size={13} />
+              <span>Search</span>
+              <kbd className="rounded-full bg-fg/[0.06] px-2 py-0.5 font-mono text-[10px]">⌘K</kbd>
+            </button>
+            <ThemeToggle />
+            <a href={`mailto:${contact.email}`} className="btn-primary hidden h-9 px-4 text-[13px] lg:inline-flex">
+              Let&apos;s talk
+            </a>
+            <button
+              type="button"
+              className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-fg md:hidden"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+            >
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </nav>
+
+      </header>
+
+      {/* Rendered outside <header>: its backdrop-filter would otherwise trap this fixed overlay inside the 68px bar */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             id="mobile-menu"
-            className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] bg-bg md:hidden"
+            data-lenis-prevent
+            className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-40 overflow-y-auto bg-bg pb-10 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -151,6 +156,6 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

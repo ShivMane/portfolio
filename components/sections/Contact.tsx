@@ -61,7 +61,7 @@ export function Contact() {
     );
 
   return (
-    <section id="contact" className="container-page py-20 md:py-28" aria-labelledby="contact-heading">
+    <section id="contact" className="container-page py-16 md:py-28" aria-labelledby="contact-heading">
       <Reveal>
         <div className="flex items-center gap-3 border-t hairline pt-5">
           <span className="eyebrow text-accent">05</span>

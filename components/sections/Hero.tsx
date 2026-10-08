@@ -5,7 +5,6 @@ import {
   animate,
   motion,
   useInView,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -80,17 +79,16 @@ export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
 
-  // Scroll-linked depth: headline drifts up and fades, panel moves slower
+  // Scroll-linked depth: headline drifts up and fades as you scroll away
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const headlineY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -140]);
   const headlineOpacity = useTransform(scrollYProgress, [0, 0.55], [1, reduce ? 1 : 0.15]);
-  const panelY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -60]);
   const dotsY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120]);
 
-  // Soft accent glow that trails the cursor
-  const mx = useSpring(useMotionValue(-400), { stiffness: 80, damping: 20 });
-  const my = useSpring(useMotionValue(-400), { stiffness: 80, damping: 20 });
-  const glow = useMotionTemplate`radial-gradient(520px circle at ${mx}px ${my}px, rgb(var(--accent) / 0.09), transparent 70%)`;
+  // Soft accent glow that trails the cursor. A pre-painted circle moved with
+  // transforms, so the browser never repaints the hero while the mouse moves.
+  const mx = useSpring(useMotionValue(-1000), { stiffness: 80, damping: 20 });
+  const my = useSpring(useMotionValue(-1000), { stiffness: 80, damping: 20 });
   const onPointerMove = (e: React.PointerEvent) => {
     if (reduce || e.pointerType !== "mouse" || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
@@ -110,7 +108,12 @@ export function Hero() {
         style={{ y: dotsY }}
         className="pointer-events-none absolute inset-x-0 top-0 h-[70vh] bg-dots opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
       />
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: glow }} />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute left-0 top-0 -ml-[260px] -mt-[260px] h-[520px] w-[520px] rounded-full will-change-transform"
+          style={{ x: mx, y: my, background: "radial-gradient(circle, rgb(var(--accent) / 0.09), transparent 70%)" }}
+        />
+      </div>
 
       <div className="container-page relative">
         {/* Meta row */}
@@ -185,7 +188,7 @@ export function Hero() {
             </div>
           </motion.div>
 
-          <motion.div className="min-w-0 lg:col-span-7" style={{ y: panelY }}>
+          <div className="min-w-0 lg:col-span-7">
             <motion.div
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -193,7 +196,7 @@ export function Hero() {
             >
               <SystemPanel />
             </motion.div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Metrics ledger */}

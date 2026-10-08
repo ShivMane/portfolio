@@ -88,9 +88,11 @@ function PeerVisual() {
           />
         </div>
         <div className="space-y-2">
-          <div className="flex justify-between font-mono text-[10px] text-muted sm:text-[11px]">
-            <span>design-system.fig</span>
-            <span>socket :52831 · invite-only</span>
+          <div className="flex justify-between gap-3 font-mono text-[10px] text-muted sm:text-[11px]">
+            <span className="truncate">design-system.fig</span>
+            <span className="shrink-0 whitespace-nowrap">
+              <span className="hidden sm:inline">socket :52831 · </span>invite-only
+            </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-fg/10">
             <motion.div

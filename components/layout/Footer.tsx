@@ -8,8 +8,8 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden border-t hairline">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-12">
-        <div className="space-y-3 md:col-span-5">
+      <div className="container-page grid grid-cols-2 gap-x-6 gap-y-10 py-14 md:grid-cols-12">
+        <div className="col-span-2 space-y-3 md:col-span-5">
           <p className="text-lg tracking-tight">{siteMeta.name}</p>
           <p className="max-w-xs text-sm text-muted">
             {hero.role} building dependable software from {hero.location}.
@@ -21,10 +21,10 @@ export function Footer() {
 
         <nav className="md:col-span-3" aria-label="Footer">
           <p className="eyebrow mb-4">Sitemap</p>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-0.5 text-sm">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <a href={l.href} className="text-muted transition-colors hover:text-fg">
+                <a href={l.href} className="inline-block py-1.5 text-muted transition-colors hover:text-fg">
                   {l.label}
                 </a>
               </li>
@@ -34,14 +34,14 @@ export function Footer() {
 
         <div className="md:col-span-3">
           <p className="eyebrow mb-4">Socials</p>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-0.5 text-sm">
             {socialLinks.map((l) => (
               <li key={l.label}>
                 <a
                   href={l.href}
                   target={l.href.startsWith("mailto:") ? undefined : "_blank"}
                   rel="noopener noreferrer"
-                  className="text-muted transition-colors hover:text-fg"
+                  className="inline-block py-1.5 text-muted transition-colors hover:text-fg"
                 >
                   {l.label}
                 </a>
@@ -50,7 +50,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div className="flex md:col-span-1 md:justify-end">
+        <div className="col-span-2 flex md:col-span-1 md:justify-end">
           <a
             href="#top"
             className="grid h-10 w-10 place-items-center rounded-full border hairline transition-colors hover:bg-fg hover:text-bg"

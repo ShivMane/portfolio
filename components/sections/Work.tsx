@@ -24,12 +24,12 @@ function ProjectLinks({ project }: { project: Project }) {
   return (
     <div className="flex flex-wrap items-center gap-4 text-sm">
       {project.liveUrl && (
-        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex items-center gap-1">
+        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="link-underline -my-2 inline-flex items-center gap-1 py-2">
           Live site <ArrowUpRight size={14} />
         </a>
       )}
       {project.githubUrl && (
-        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-muted transition-colors hover:text-fg">
+        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="-my-2 inline-flex items-center gap-1.5 py-2 text-muted transition-colors hover:text-fg">
           <GithubIcon className="h-3.5 w-3.5" /> Source
         </a>
       )}
@@ -137,6 +137,22 @@ function CaseStudy({ project, onClose }: { project: Project; onClose: () => void
   );
 }
 
+// Must match the sticky breakpoint on the card wrapper below
+const STACK_QUERY = "(min-width: 1024px) and (min-height: 760px)";
+
+/** True on screens tall and wide enough for the cards to pin and stack. */
+function useStacking() {
+  const [stacks, setStacks] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(STACK_QUERY);
+    setStacks(mql.matches);
+    const onChange = (e: MediaQueryListEvent) => setStacks(e.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+  return stacks;
+}
+
 /** Featured project card: pins and stacks on tall desktop screens, with a cursor spotlight. */
 function StackCard({
   project,
@@ -152,10 +168,12 @@ function StackCard({
   onOpen: () => void;
 }) {
   const reduce = useReducedMotion();
-  // Earlier cards shrink back as later ones slide over them
+  const stacks = useStacking();
+  const still = reduce || !stacks;
+  // Earlier cards shrink back as later ones slide over them (only where they stack)
   const targetScale = 1 - (total - 1 - index) * 0.06;
-  const scale = useTransform(progress, [index / total, 1], [1, reduce ? 1 : targetScale]);
-  const dim = useTransform(progress, [index / total, 1], [0, reduce ? 0 : (total - 1 - index) * 0.35]);
+  const scale = useTransform(progress, [index / total, 1], [1, still ? 1 : targetScale]);
+  const dim = useTransform(progress, [index / total, 1], [0, still ? 0 : (total - 1 - index) * 0.35]);
 
   // "View case study" bubble that trails the cursor over the preview
   const bx = useSpring(useMotionValue(0), { stiffness: 300, damping: 28 });
@@ -264,7 +282,7 @@ export function Work() {
   const rest = projects.filter((p) => !p.featured);
 
   return (
-    <section id="work" className="container-page py-20 md:py-28" aria-labelledby="work-heading">
+    <section id="work" className="container-page py-16 md:py-28" aria-labelledby="work-heading">
       <SectionHeader
         index="01"
         label="Selected work"
