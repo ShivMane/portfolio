@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter_Tight, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { siteMeta, contact, socialLinks } from "@/data/config";
+import { about, contact, experience, hero, siteMeta, skills, socialLinks } from "@/data/config";
 
 const sans = Inter_Tight({
   subsets: ["latin"],
@@ -32,12 +32,29 @@ export const metadata: Metadata = {
     template: `%s | ${siteMeta.name}`,
   },
   description: siteMeta.description,
+  applicationName: siteMeta.name,
   keywords: siteMeta.keywords,
   authors: [{ name: siteMeta.name, url: siteMeta.url }],
   creator: siteMeta.name,
+  publisher: siteMeta.name,
+  category: "technology",
+  alternates: {
+    canonical: "/",
+  },
+  formatDetection: {
+    email: false,
+    telephone: false,
+    address: false,
+  },
+  // Paste the code from Google Search Console → Settings → Ownership verification (HTML tag)
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type: "profile",
+    firstName: siteMeta.name.split(" ")[0],
+    lastName: siteMeta.name.split(" ").slice(1).join(" "),
+    locale: siteMeta.locale,
     url: siteMeta.url,
     siteName: siteMeta.name,
     title: siteMeta.title,
@@ -47,7 +64,7 @@ export const metadata: Metadata = {
         url: siteMeta.ogImage,
         width: 1200,
         height: 630,
-        alt: `${siteMeta.name} — Portfolio`,
+        alt: `${siteMeta.name} | Portfolio`,
       },
     ],
   },
@@ -80,17 +97,43 @@ export const viewport: Viewport = {
   ],
 };
 
+// Structured data so search engines understand who this site is about
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: siteMeta.name,
-  url: siteMeta.url,
-  description: siteMeta.description,
-  jobTitle: "Full-Stack Engineer",
-  email: contact.email,
-  sameAs: socialLinks
-    .filter((l) => l.icon !== "Mail")
-    .map((l) => l.href),
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteMeta.url}/#website`,
+      url: siteMeta.url,
+      name: siteMeta.name,
+      description: siteMeta.description,
+      inLanguage: "en",
+      publisher: { "@id": `${siteMeta.url}/#person` },
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": `${siteMeta.url}/#profile`,
+      url: siteMeta.url,
+      name: siteMeta.title,
+      isPartOf: { "@id": `${siteMeta.url}/#website` },
+      mainEntity: { "@id": `${siteMeta.url}/#person` },
+    },
+    {
+      "@type": "Person",
+      "@id": `${siteMeta.url}/#person`,
+      name: siteMeta.name,
+      url: siteMeta.url,
+      image: `${siteMeta.url}${siteMeta.ogImage}`,
+      description: siteMeta.description,
+      jobTitle: hero.role,
+      email: `mailto:${contact.email}`,
+      worksFor: { "@type": "Organization", name: experience[0]?.company },
+      alumniOf: { "@type": "CollegeOrUniversity", name: about.education.school },
+      address: { "@type": "PostalAddress", addressLocality: "Pune", addressCountry: "IN" },
+      knowsAbout: skills.map((s) => s.name),
+      sameAs: socialLinks.filter((l) => l.icon !== "Mail").map((l) => l.href),
+    },
+  ],
 };
 
 export default function RootLayout({

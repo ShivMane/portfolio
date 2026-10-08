@@ -2,6 +2,7 @@ import { about, hero, workProcess } from "@/data/config";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { LocalTime } from "@/components/ui/LocalTime";
+import { ScrollText } from "@/components/motion/ScrollText";
 
 export function About() {
   return (
@@ -19,7 +20,7 @@ export function About() {
 
       <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
         <Reveal className="space-y-6 text-lg leading-relaxed text-muted lg:col-span-7">
-          <p className="text-2xl leading-snug tracking-tight text-fg md:text-[1.75rem]">{about.statement}</p>
+          <ScrollText text={about.statement} className="text-2xl leading-snug tracking-tight text-fg md:text-[1.75rem]" />
           {about.bio.map((para) => (
             <p key={para.slice(0, 24)}>{para}</p>
           ))}

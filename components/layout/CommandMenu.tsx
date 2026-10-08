@@ -16,6 +16,7 @@ import {
 import { contact, hero, navLinks, socialLinks } from "@/data/config";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/ui/SocialIcons";
 import { cn } from "@/lib/utils";
+import { lockScroll, scrollToTarget, unlockScroll } from "@/lib/scroll";
 
 export const OPEN_COMMAND_MENU = "open-command-menu";
 
@@ -63,7 +64,7 @@ export function CommandMenu() {
         label: l.label,
         hint: l.href,
         icon: Hash,
-        run: () => document.querySelector(l.href)?.scrollIntoView({ behavior: "smooth" }),
+        run: () => scrollToTarget(l.href),
       })),
       {
         id: "copy-email",
@@ -126,10 +127,10 @@ export function CommandMenu() {
   useEffect(() => {
     if (!open) return;
     const prev = document.activeElement as HTMLElement | null;
-    document.body.style.overflow = "hidden";
+    lockScroll();
     requestAnimationFrame(() => inputRef.current?.focus());
     return () => {
-      document.body.style.overflow = "";
+      unlockScroll();
       prev?.focus?.();
     };
   }, [open]);
@@ -198,7 +199,7 @@ export function CommandMenu() {
                 <kbd className="chip">esc</kbd>
               </div>
 
-              <ul id="command-list" role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+              <ul id="command-list" role="listbox" data-lenis-prevent className="max-h-[50vh] overflow-y-auto overscroll-contain p-2">
                 {filtered.length === 0 && (
                   <li className="px-3 py-8 text-center text-sm text-muted">No results for “{query}”</li>
                 )}

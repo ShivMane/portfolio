@@ -1,4 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { SmoothScroll } from "@/providers/SmoothScroll";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
@@ -12,6 +14,8 @@ import { Contact } from "@/components/sections/Contact";
 export default function Home() {
   return (
     <>
+      <SmoothScroll />
+      <ScrollProgress />
       <Navbar />
       <CommandMenu />
 

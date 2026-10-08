@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { animate, motion, useInView, useReducedMotion } from "framer-motion";
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { contact, hero } from "@/data/config";
 import { LocalTime } from "@/components/ui/LocalTime";
 import { CopyEmail } from "@/components/ui/CopyEmail";
 import { SystemPanel } from "./SystemPanel";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -66,9 +77,40 @@ export function Hero() {
   const beforeCount = before.split(" ").length;
   const accentCount = accent.split(" ").length;
 
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+
+  // Scroll-linked depth: headline drifts up and fades, panel moves slower
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const headlineY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -140]);
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.55], [1, reduce ? 1 : 0.15]);
+  const panelY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -60]);
+  const dotsY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120]);
+
+  // Soft accent glow that trails the cursor
+  const mx = useSpring(useMotionValue(-400), { stiffness: 80, damping: 20 });
+  const my = useSpring(useMotionValue(-400), { stiffness: 80, damping: 20 });
+  const glow = useMotionTemplate`radial-gradient(520px circle at ${mx}px ${my}px, rgb(var(--accent) / 0.09), transparent 70%)`;
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (reduce || e.pointerType !== "mouse" || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    mx.set(e.clientX - r.left);
+    my.set(e.clientY - r.top);
+  };
+
   return (
-    <section id="top" className="relative pt-[calc(var(--nav-h)+2.5rem)] md:pt-[calc(var(--nav-h)+4rem)]" aria-labelledby="hero-heading">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[70vh] bg-dots opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+    <section
+      ref={ref}
+      id="top"
+      onPointerMove={onPointerMove}
+      className="relative pt-[calc(var(--nav-h)+2.5rem)] md:pt-[calc(var(--nav-h)+4rem)]"
+      aria-labelledby="hero-heading"
+    >
+      <motion.div
+        style={{ y: dotsY }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[70vh] bg-dots opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
+      />
+      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: glow }} />
 
       <div className="container-page relative">
         {/* Meta row */}
@@ -96,16 +138,16 @@ export function Hero() {
         </motion.div>
 
         {/* Headline */}
-        <h1 id="hero-heading" className="mt-10 text-display-xl md:mt-14">
+        <motion.h1 id="hero-heading" className="mt-10 text-display-xl md:mt-14" style={{ y: headlineY, opacity: headlineOpacity }}>
           <span className="sr-only">
-            {hero.name} — {before} {accent} {after}
+            {hero.name}. {before} {accent} {after}
           </span>
           <span aria-hidden="true">
             <Words text={before} />
             <Words text={accent} offset={beforeCount} className="serif-accent text-accent pr-[0.04em]" />
             <Words text={after} offset={beforeCount + accentCount} />
           </span>
-        </h1>
+        </motion.h1>
 
         {/* Intro + live panel */}
         <div className="mt-12 grid grid-cols-1 gap-10 md:mt-16 lg:grid-cols-12 lg:gap-12">
@@ -120,14 +162,18 @@ export function Hero() {
             </p>
             <div className="flex flex-col gap-5">
               <div className="flex flex-wrap gap-3">
-                <a href={hero.ctaPrimary.href} className="btn-primary group">
-                  {hero.ctaPrimary.label}
-                  <ArrowDown size={15} className="transition-transform group-hover:translate-y-0.5" />
-                </a>
-                <a href={hero.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost group">
-                  Résumé
-                  <ArrowUpRight size={15} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </a>
+                <Magnetic>
+                  <a href={hero.ctaPrimary.href} className="btn-primary group">
+                    {hero.ctaPrimary.label}
+                    <ArrowDown size={15} className="transition-transform group-hover:translate-y-0.5" />
+                  </a>
+                </Magnetic>
+                <Magnetic>
+                  <a href={hero.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost group">
+                    Résumé
+                    <ArrowUpRight size={15} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                </Magnetic>
               </div>
               <div className="flex items-center gap-3">
                 <a href={`mailto:${contact.email}`} className="link-underline text-sm">
@@ -139,13 +185,14 @@ export function Hero() {
             </div>
           </motion.div>
 
-          <motion.div
-            className="min-w-0 lg:col-span-7"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.75, ease }}
-          >
-            <SystemPanel />
+          <motion.div className="min-w-0 lg:col-span-7" style={{ y: panelY }}>
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1.1, delay: 0.75, ease }}
+            >
+              <SystemPanel />
+            </motion.div>
           </motion.div>
         </div>
 

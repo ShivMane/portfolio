@@ -1,6 +1,7 @@
 import { skills, skillCategories } from "@/data/config";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
+import { VelocityMarquee } from "@/components/motion/VelocityMarquee";
 
 const groups = skillCategories.filter((c) => c.id !== "all");
 
@@ -23,20 +24,16 @@ export function Stack() {
         />
       </div>
 
-      {/* Oversized marquee of tool names */}
-      <div className="mask-fade-x mb-16 overflow-hidden border-y hairline py-6 md:mb-20" aria-hidden="true">
-        <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
-          {[0, 1].map((dup) => (
-            <div key={dup} className="flex shrink-0 items-center">
-              {names.map((n) => (
-                <span key={`${dup}-${n}`} className="flex items-center whitespace-nowrap px-6 text-4xl font-medium tracking-tight text-fg/80 md:text-6xl">
-                  {n}
-                  <span className="ml-12 text-2xl text-accent md:text-3xl">✦</span>
-                </span>
-              ))}
-            </div>
+      {/* Oversized marquee of tool names: speeds up and reverses with scroll */}
+      <div className="mask-fade-x mb-16 border-y hairline py-6 md:mb-20" aria-hidden="true">
+        <VelocityMarquee>
+          {names.map((n) => (
+            <span key={n} className="flex items-center whitespace-nowrap px-6 text-4xl font-medium tracking-tight text-fg/80 md:text-6xl">
+              {n}
+              <span className="ml-12 text-2xl text-accent md:text-3xl">✦</span>
+            </span>
           ))}
-        </div>
+        </VelocityMarquee>
       </div>
 
       <div className="container-page">

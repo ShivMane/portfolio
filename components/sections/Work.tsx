@@ -1,13 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { projects, type Project } from "@/data/config";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { GithubIcon } from "@/components/ui/SocialIcons";
 import { ProjectVisual } from "./ProjectVisuals";
+import { lockScroll, unlockScroll } from "@/lib/scroll";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 function ProjectLinks({ project }: { project: Project }) {
   return (
@@ -29,11 +40,11 @@ function ProjectLinks({ project }: { project: Project }) {
 function CaseStudy({ project, onClose }: { project: Project; onClose: () => void }) {
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
-    document.body.style.overflow = "hidden";
+    lockScroll();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      unlockScroll();
       window.removeEventListener("keydown", onKey);
       prev?.focus?.();
     };
@@ -53,7 +64,8 @@ function CaseStudy({ project, onClose }: { project: Project; onClose: () => void
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-title"
-        className="h-full w-full max-w-2xl overflow-y-auto border-l hairline bg-bg"
+        data-lenis-prevent
+        className="h-full w-full max-w-2xl overflow-y-auto overscroll-contain border-l hairline bg-bg"
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
@@ -125,10 +137,130 @@ function CaseStudy({ project, onClose }: { project: Project; onClose: () => void
   );
 }
 
+/** Featured project card: pins and stacks on tall desktop screens, with a cursor spotlight. */
+function StackCard({
+  project,
+  index,
+  total,
+  progress,
+  onOpen,
+}: {
+  project: Project;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+  onOpen: () => void;
+}) {
+  const reduce = useReducedMotion();
+  // Earlier cards shrink back as later ones slide over them
+  const targetScale = 1 - (total - 1 - index) * 0.06;
+  const scale = useTransform(progress, [index / total, 1], [1, reduce ? 1 : targetScale]);
+  const dim = useTransform(progress, [index / total, 1], [0, reduce ? 0 : (total - 1 - index) * 0.35]);
+
+  // "View case study" bubble that trails the cursor over the preview
+  const bx = useSpring(useMotionValue(0), { stiffness: 300, damping: 28 });
+  const by = useSpring(useMotionValue(0), { stiffness: 300, damping: 28 });
+  const [hovering, setHovering] = useState(false);
+
+  const onCardMove = (e: React.PointerEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--spot-x", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--spot-y", `${e.clientY - r.top}px`);
+  };
+  const onVisualMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    bx.set(e.clientX - r.left);
+    by.set(e.clientY - r.top);
+  };
+
+  return (
+    <div
+      className="[@media(min-width:1024px)_and_(min-height:760px)]:sticky"
+      style={{ top: `calc(var(--nav-h) + 1.5rem + ${index * 1.75}rem)` }}
+    >
+      <Reveal>
+        <motion.article
+          style={{ scale, transformOrigin: "top center" }}
+          onPointerMove={onCardMove}
+          className="group relative grid grid-cols-1 overflow-hidden rounded-2xl border hairline bg-surface transition-colors hover:border-fg/20 lg:grid-cols-12 [&>*]:min-w-0"
+        >
+          {/* Cursor spotlight */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background: "radial-gradient(480px circle at var(--spot-x) var(--spot-y), rgb(var(--fg) / 0.06), transparent 65%)",
+            }}
+          />
+          {/* Darkens cards that are being stacked over */}
+          <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-bg" style={{ opacity: dim }} />
+
+          <button
+            type="button"
+            onClick={onOpen}
+            onPointerMove={onVisualMove}
+            onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
+            onPointerLeave={() => setHovering(false)}
+            aria-label={`Open ${project.title} case study`}
+            className={`relative z-10 block p-3 text-left sm:p-4 lg:col-span-7 [@media(pointer:fine)]:cursor-none ${index % 2 === 1 ? "lg:order-2" : ""}`}
+          >
+            <div className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.015]">
+              <ProjectVisual id={project.id} />
+            </div>
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-0 top-0 z-10 -ml-12 -mt-12 grid h-24 w-24 place-items-center rounded-full bg-accent text-center font-mono text-[10px] uppercase leading-tight tracking-[0.12em] text-accent-fg"
+              style={{ x: bx, y: by }}
+              initial={false}
+              animate={{ scale: hovering && !reduce ? 1 : 0, opacity: hovering && !reduce ? 1 : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            >
+              View
+              <br />
+              case study
+            </motion.span>
+          </button>
+
+          <div className="relative z-10 flex flex-col justify-between gap-8 p-6 sm:p-8 lg:col-span-5 lg:p-10">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs text-accent">/{String(index + 1).padStart(2, "0")}</span>
+                <span className="eyebrow">{project.tags.slice(0, 2).join(" · ")}</span>
+              </div>
+              <h3 className="text-3xl tracking-tight md:text-4xl">{project.title}</h3>
+              <p className="leading-relaxed text-muted">{project.description}</p>
+            </div>
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-1.5">
+                {project.tags.map((t) => (
+                  <span key={t} className="chip">
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t hairline pt-5">
+                <Magnetic strength={0.25}>
+                  <button type="button" onClick={onOpen} className="btn-primary h-10 px-4 text-[13px]">
+                    Read case study
+                  </button>
+                </Magnetic>
+                <ProjectLinks project={project} />
+              </div>
+            </div>
+          </div>
+        </motion.article>
+      </Reveal>
+    </div>
+  );
+}
+
 export function Work() {
   const [open, setOpen] = useState<Project | null>(null);
   const close = useCallback(() => setOpen(null), []);
   const featured = projects.filter((p) => p.featured);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: stackProgress } = useScroll({ target: stackRef, offset: ["start start", "end end"] });
   const rest = projects.filter((p) => !p.featured);
 
   return (
@@ -142,45 +274,19 @@ export function Work() {
             Things I&apos;ve <span className="serif-accent">designed, built</span> &amp; shipped.
           </>
         }
-        aside={<p>Side projects where I own every layer — from sockets and schemas to the last pixel.</p>}
+        aside={<p>Side projects where I own every layer, from sockets and schemas to the last pixel.</p>}
       />
 
-      <div className="space-y-6 md:space-y-8">
+      <div ref={stackRef} className="space-y-6 md:space-y-8">
         {featured.map((project, i) => (
-          <Reveal key={project.id}>
-            <article className="group grid grid-cols-1 overflow-hidden rounded-2xl [&>*]:min-w-0 border hairline bg-surface transition-colors hover:border-fg/20 lg:grid-cols-12">
-              <div className={`p-3 sm:p-4 lg:col-span-7 ${i % 2 === 1 ? "lg:order-2" : ""}`}>
-                <div className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.015]">
-                  <ProjectVisual id={project.id} />
-                </div>
-              </div>
-              <div className="flex flex-col justify-between gap-8 p-6 sm:p-8 lg:col-span-5 lg:p-10">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-accent">/{String(i + 1).padStart(2, "0")}</span>
-                    <span className="eyebrow">{project.tags.slice(0, 2).join(" · ")}</span>
-                  </div>
-                  <h3 className="text-3xl tracking-tight md:text-4xl">{project.title}</h3>
-                  <p className="leading-relaxed text-muted">{project.description}</p>
-                </div>
-                <div className="space-y-6">
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tags.map((t) => (
-                      <span key={t} className="chip">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-t hairline pt-5">
-                    <button type="button" onClick={() => setOpen(project)} className="btn-primary h-10 px-4 text-[13px]">
-                      Read case study
-                    </button>
-                    <ProjectLinks project={project} />
-                  </div>
-                </div>
-              </div>
-            </article>
-          </Reveal>
+          <StackCard
+            key={project.id}
+            project={project}
+            index={i}
+            total={featured.length}
+            progress={stackProgress}
+            onOpen={() => setOpen(project)}
+          />
         ))}
       </div>
 

@@ -8,6 +8,7 @@ import { useActiveSection } from "@/lib/hooks/useActiveSection";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { OPEN_COMMAND_MENU } from "./CommandMenu";
 import { cn } from "@/lib/utils";
+import { lockScroll, scrollToTarget, unlockScroll } from "@/lib/scroll";
 
 // Stable reference — navLinks is a module-level constant
 const sectionHrefs = ["#top", ...navLinks.map((l) => l.href)] as readonly string[];
@@ -25,7 +26,8 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (menuOpen) lockScroll();
+    else unlockScroll();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -41,7 +43,7 @@ export function Navbar() {
       )}
     >
       <nav className="container-page flex h-full items-center justify-between gap-6" aria-label="Main">
-        <a href="#top" className="group flex items-center gap-3" aria-label={`${hero.name} — home`}>
+        <a href="#top" className="group flex items-center gap-3" aria-label={`${hero.name}, home`}>
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-fg font-mono text-[11px] font-medium text-bg transition-colors group-hover:bg-accent group-hover:text-accent-fg">
             SM
           </span>
@@ -124,7 +126,12 @@ export function Navbar() {
                 >
                   <a
                     href={link.href}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMenuOpen(false);
+                      // Wait for the menu to release the scroll lock
+                      setTimeout(() => scrollToTarget(link.href), 50);
+                    }}
                     className="flex items-baseline justify-between py-5 text-4xl font-medium tracking-tight"
                   >
                     {link.label}

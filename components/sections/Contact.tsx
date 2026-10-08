@@ -15,10 +15,11 @@ const schema = z.object({
   email: z.string().email("Enter a valid email address"),
   subject: z.string().min(3, "Subject must be at least 3 characters"),
   message: z.string().min(20, "Message must be at least 20 characters"),
+  _gotcha: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
-type SubmitStatus = "idle" | "success" | "error" | "env-missing";
+type SubmitStatus = "idle" | "success" | "error" | "not-configured";
 
 const fields = [
   { name: "name", label: "Your name", type: "text", autoComplete: "name", placeholder: "Jane Doe" },
@@ -38,13 +39,13 @@ export function Contact() {
 
   const onSubmit = async (data: FormValues) => {
     setStatus("idle");
+    if (!contact.formspreeId) return setStatus("not-configured");
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(`https://formspree.io/f/${contact.formspreeId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ ...data, _subject: `[Portfolio] ${data.subject}` }),
       });
-      if (res.status === 503) return setStatus("env-missing");
       if (!res.ok) return setStatus("error");
       setStatus("success");
       reset();
@@ -119,6 +120,8 @@ export function Contact() {
             className="rounded-2xl border hairline bg-surface p-6 sm:p-10"
             aria-describedby="form-status"
           >
+            {/* Honeypot: hidden from people, Formspree drops submissions that fill it */}
+            <input type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" {...register("_gotcha")} />
             <div className="grid gap-8 sm:grid-cols-2">
               {fields.map((f) => (
                 <div key={f.name} className={f.name === "subject" ? "sm:col-span-2" : ""}>
@@ -167,13 +170,13 @@ export function Contact() {
               <p id="form-status" role="status" className="text-sm">
                 {status === "success" && (
                   <span className="inline-flex items-center gap-2 text-ok">
-                    <Check size={15} /> Thanks — I&apos;ll reply within 24 hours.
+                    <Check size={15} /> Thanks! I&apos;ll reply within 24 hours.
                   </span>
                 )}
                 {status === "error" && <span className="text-accent">Something went wrong. Please email me directly.</span>}
-                {status === "env-missing" && (
+                {status === "not-configured" && (
                   <span className="text-accent">
-                    The form isn&apos;t live yet — email me at{" "}
+                    The form isn&apos;t live yet. Email me at{" "}
                     <a href={`mailto:${contact.email}`} className="underline">
                       {contact.email}
                     </a>

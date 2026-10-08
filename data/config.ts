@@ -4,22 +4,29 @@
 
 export const siteMeta = {
   name: "Shivprasad Mane",
-  title: "Shivprasad Mane — Full-Stack Software Engineer",
+  title: "Shivprasad Mane | Full-Stack Software Engineer",
   description:
     "Full-Stack Software Engineer specializing in FinTech platforms with React, NestJS, TypeScript, and PostgreSQL. Building scalable multi-tenant systems at Mettarev.",
-  url: "https://shivprasadmane.dev",
+  url: "https://shivprasad-mane.vercel.app",
   ogImage: "/og",
   twitterHandle: "@shivprasadmane",
   keywords: [
+    "Shivprasad Mane",
+    "Shivprasad Mane portfolio",
     "full-stack engineer",
-    "react developer",
-    "nestjs",
-    "typescript",
-    "postgresql",
-    "fintech",
-    "portfolio",
-    "shivprasad mane",
+    "full-stack developer Pune",
+    "software engineer India",
+    "FinTech software engineer",
+    "React developer",
+    "Next.js developer",
+    "NestJS developer",
+    "TypeScript developer",
+    "PostgreSQL",
+    "Node.js",
+    "REST API design",
+    "multi-tenant SaaS",
   ],
+  locale: "en_IN",
 };
 
 // ─── Navigation ────────────────────────────────────────────────
@@ -46,7 +53,7 @@ export const hero = {
     after: "that holds up in production.",
   },
   tagline:
-    "Full-stack engineer at Mettarev, shipping a 51-module multi-tenant FinTech platform end to end — from NestJS APIs and PostgreSQL schemas to the React interfaces people actually use.",
+    "Full-stack engineer at Mettarev, shipping a 51-module multi-tenant FinTech platform end to end, from NestJS APIs and PostgreSQL schemas to the React interfaces people actually use.",
   ctaPrimary: { label: "See selected work", href: "#work" },
   ctaSecondary: { label: "Get in touch", href: "#contact" },
   resumeUrl: "/resume.pdf",
@@ -78,7 +85,7 @@ export const systemLog = [
 export const about = {
   avatar: "/images/avatar.svg",
   statement:
-    "The transactions, permissions, and cron jobs that quietly keep money moving correctly — that's where I do my best work.",
+    "The transactions, permissions, and cron jobs that quietly keep money moving correctly. That's where I do my best work.",
   now: [
     { label: "Building", value: "Multi-tenant FinTech platform @ Mettarev" },
     { label: "Exploring", value: "AI agents in real-time video" },
@@ -90,7 +97,7 @@ export const about = {
   },
   bio: [
     "I'm a Full-Stack Software Engineer specializing in FinTech platforms, with deep expertise in React, NestJS, TypeScript, and PostgreSQL. Currently at Mettarev, I architect and ship features across a 51-module, multi-tenant white-label FinTech platform used by real financial businesses.",
-    "I enjoy the complexity that comes with production-grade systems — designing 370-endpoint REST APIs, enforcing role-based access via CASL policy models, ensuring transactional consistency across financial flows, and automating operations with cron jobs and webhook integrations.",
+    "I enjoy the complexity that comes with production-grade systems: designing 370-endpoint REST APIs, enforcing role-based access via CASL policy models, ensuring transactional consistency across financial flows, and automating operations with cron jobs and webhook integrations.",
     "B.Tech in Computer Science from G H Raisoni College of Engineering, Pune. When I'm not building at Mettarev, I'm working on AI-powered apps, P2P systems, and ML projects.",
   ],
   highlights: [
@@ -184,7 +191,7 @@ export const projects: Project[] = [
       solution:
         "Built a full-stack video meeting platform with Next.js 15 and tRPC. AI agents powered by OpenAI and Gemini APIs auto-join meetings via webhook-based session lifecycle events. React Query caching and server-client hydration keep the UI snappy even during live calls.",
       impact:
-        "Delivered a working AI meeting assistant platform with fully automated agent lifecycle — from creation, to auto-join, to real-time in-call interaction — with zero manual intervention.",
+        "Delivered a working AI meeting assistant platform with fully automated agent lifecycle, from creation to auto-join to real-time in-call interaction, with zero manual intervention.",
       metrics: [
         { value: "2", label: "AI APIs integrated" },
         { value: "CRUD", label: "Full agent & meeting mgmt" },
@@ -197,7 +204,7 @@ export const projects: Project[] = [
     id: "filepeer",
     title: "FilePeer",
     description:
-      "Secure peer-to-peer file sharing platform with direct transfers — no intermediary cloud storage, powered by a Java socket backend on AWS EC2.",
+      "Secure peer-to-peer file sharing platform with direct transfers and no intermediary cloud storage, powered by a Java socket backend on AWS EC2.",
     longDescription:
       "FilePeer is a P2P file sharing platform built for secure, real-time transfers without routing data through intermediary cloud storage. A custom Java backend using socket programming and REST APIs handles the transfer layer. The backend runs on AWS EC2 behind an Nginx reverse proxy; the Next.js frontend is hosted on Vercel. Invite-based sharing uses temporary port allocation for secure, one-time access.",
     thumbnail: "/images/project-tradepulse.svg",
@@ -206,11 +213,11 @@ export const projects: Project[] = [
     featured: true,
     caseStudy: {
       problem:
-        "Existing file sharing tools route data through cloud intermediaries, introducing latency and privacy risks for sensitive file transfers — especially in low-trust or high-security contexts.",
+        "Existing file sharing tools route data through cloud intermediaries, introducing latency and privacy risks for sensitive file transfers, especially in low-trust or high-security contexts.",
       solution:
         "Designed a Java backend with raw socket programming for direct peer-to-peer transfers. Deployed on AWS EC2 behind Nginx. Invite-based sharing generates temporary port allocations so each transfer session is isolated and expires after use.",
       impact:
-        "Achieved secure P2P file transfer with zero cloud intermediary, full EC2 deployment with Nginx routing, and a polished Next.js frontend on Vercel — production-ready architecture from scratch.",
+        "Achieved secure P2P file transfer with zero cloud intermediary, full EC2 deployment with Nginx routing, and a polished Next.js frontend on Vercel. Production-ready architecture from scratch.",
       metrics: [
         { value: "P2P", label: "No cloud intermediary" },
         { value: "AWS EC2", label: "Backend deployment" },
@@ -223,7 +230,7 @@ export const projects: Project[] = [
     id: "disease-prediction",
     title: "Predictive Disease Analysis",
     description:
-      "ML system predicting diabetes, heart disease, and Parkinson's using Logistic Regression, Random Forest, and SVM — 85% accuracy with an interactive Streamlit dashboard.",
+      "ML system predicting diabetes, heart disease, and Parkinson's using Logistic Regression, Random Forest, and SVM, reaching 85% accuracy with an interactive Streamlit dashboard.",
     longDescription:
       "Built an ML system that predicts three diseases (diabetes, heart disease, Parkinson's) from clinical datasets. Used Logistic Regression, Random Forest, and SVM with feature selection on UCI datasets via scikit-learn. An interactive Streamlit dashboard allows real-time predictions from user-input clinical values, with matplotlib visualisations for feature importance and model performance.",
     thumbnail: "/images/project-aurora.svg",
@@ -259,7 +266,7 @@ export const experience: Experience[] = [
   {
     role: "Software Developer",
     company: "Mettarev",
-    period: "May 2026 — Present",
+    period: "May 2026 - Present",
     location: "Hybrid",
     description:
       "Shipping features across a 51-module, multi-tenant white-label FinTech platform with a partner-code-driven architecture supporting runtime tenant configuration.",
@@ -274,27 +281,27 @@ export const experience: Experience[] = [
   {
     role: "Software Developer (Intern)",
     company: "Mettarev",
-    period: "Feb 2026 — Apr 2026",
+    period: "Feb 2026 - Apr 2026",
     location: "Hybrid",
     description:
       "Built features and RESTful APIs for the same multi-tenant FinTech platform, delivering client, policy, and financial modules with production bug fixes.",
     achievements: [
       "Engineered reusable React components with validation, pagination, filtering, and role-based access control across multiple financial modules.",
-      "Delivered client, policy, and financial modules end-to-end — from REST API design to frontend integration — while fixing production bugs.",
+      "Delivered client, policy, and financial modules end-to-end, from REST API design to frontend integration, while fixing production bugs.",
     ],
     tech: ["React", "TypeScript", "NestJS", "TypeORM", "PostgreSQL"],
   },
   {
     role: "Software Development Intern",
     company: "SmartTech Solutions",
-    period: "Jan 2025 — Jun 2025",
+    period: "Jan 2025 - Jun 2025",
     location: "Remote",
     description:
       "Built and deployed a full MERN-stack e-commerce application, improving UI responsiveness and cutting average page load time by 30%.",
     achievements: [
       "Built and deployed a full MERN-stack e-commerce application, improving UI responsiveness and reducing average page load time by 30%.",
       "Implemented JWT and bcrypt-based authentication and authorization, strengthening platform security and session handling.",
-      "Designed REST APIs for product management, cart operations, and user interactions, ensuring reliable frontend–backend communication.",
+      "Designed REST APIs for product management, cart operations, and user interactions, ensuring reliable frontend-backend communication.",
     ],
     tech: ["React", "Node.js", "Express", "MongoDB", "JWT", "REST APIs"],
   },
@@ -314,7 +321,7 @@ export const workProcess: ProcessStep[] = [
     icon: "Compass",
     title: "Discover",
     description:
-      "I start by understanding the problem space, business constraints, and data model before writing a line of code — requirements first, always.",
+      "I start by understanding the problem space, business constraints, and data model before writing a line of code. Requirements first, always.",
   },
   {
     step: 2,
@@ -328,7 +335,7 @@ export const workProcess: ProcessStep[] = [
     icon: "Code2",
     title: "Build",
     description:
-      "I write type-safe, RBAC-enforced, tested code in small reviewable increments — full-stack, from NestJS controllers to React components.",
+      "I write type-safe, RBAC-enforced, tested code in small reviewable increments, full-stack, from NestJS controllers to React components.",
   },
   {
     step: 4,
@@ -403,7 +410,7 @@ export const testimonials: Testimonial[] = [
     company: "Mettarev",
     avatar: "/images/avatar-marcus.svg",
     quote:
-      "Ask a team member for a 2-3 sentence quote about working with you. Specifics — like the cron jobs you automated or the CASL policy model you designed — make testimonials much more compelling.",
+      "Ask a team member for a 2-3 sentence quote about working with you. Specifics, like the cron jobs you automated or the CASL policy model you designed, make testimonials much more compelling.",
   },
   {
     name: "SmartTech Mentor or Manager",
@@ -438,4 +445,7 @@ export const contact = {
     "I'm open to freelance projects, collaborations, and full-time opportunities. Drop me a line and I'll get back to you within 24 hours.",
   email: "shivprasadmane190@gmail.com",
   location: "Pune, India",
+  // Formspree form ID: the part after /f/ in your form endpoint, e.g. "xyzabcde".
+  // Can also be set with the NEXT_PUBLIC_FORMSPREE_ID environment variable.
+  formspreeId: process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "xrpeqkqj",
 };

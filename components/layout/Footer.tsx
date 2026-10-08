@@ -1,6 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import { hero, navLinks, siteMeta, socialLinks } from "@/data/config";
 import { LocalTime } from "@/components/ui/LocalTime";
+import { Wordmark } from "@/components/motion/Wordmark";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -61,11 +62,8 @@ export function Footer() {
       </div>
 
       {/* Oversized wordmark */}
-      <div className="container-page" aria-hidden="true">
-        <p className="select-none whitespace-nowrap pb-[0.12em] text-center font-medium leading-[0.9] tracking-[-0.06em] text-fg/[0.06] text-[clamp(3.5rem,15vw,15rem)]">
-          {siteMeta.name.split(" ")[0]}
-          <span className="serif-accent tracking-[-0.03em]">.</span>
-        </p>
+      <div className="container-page">
+        <Wordmark text={siteMeta.name.split(" ")[0]} />
       </div>
 
       <div className="container-page">
